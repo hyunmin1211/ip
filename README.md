@@ -2,6 +2,10 @@
 
 This is a project template for a greenfield Java project named _Chris_. Given below are instructions on how to use it.
 
+## AI Use Declaration
+
+I followed the course's AI-use guidance and restrictions throughout this project. I used AI tools across the project increments, primarily through the suggested prompts. Before accepting AI-generated suggestions, I wrote pseudocode for the intended logic, compared it with the generated code, and reviewed each change in detail. I tested the resulting behavior and made edits where necessary.
+
 ## Setting up in Intellij
 
 Prerequisites: JDK 25, update Intellij to the most recent version.
