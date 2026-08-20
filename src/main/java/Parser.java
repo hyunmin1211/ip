@@ -81,9 +81,9 @@ public final class Parser {
     }
 
     /**
-     * Extracts and validates a task index from a mark or unmark command.
+     * Extracts and validates a task index from a mark, unmark, or delete command.
      *
-     * @param input Complete mark or unmark command.
+     * @param input Complete mark, unmark, or delete command.
      * @param command Command word being parsed.
      * @param taskCount Current number of stored tasks.
      * @return Zero-based index of the selected task.

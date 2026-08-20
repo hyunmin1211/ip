@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -20,8 +21,7 @@ public class Chris {
                 + " \\____|_| |_|_|  |_|___/";
         String line = "____________________________________________________________";
 
-        Task[] tasks = new Task[100];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         System.out.println(line);
         System.out.println(banner);
@@ -38,36 +38,43 @@ public class Chris {
 
             try {
                 switch (command) {
-                case "bye" -> {
-                    System.out.println("Bye. Hope to see you again soon!");
-                    shouldExit = true;
-                }
-                case "list" -> {
-                    System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + "." + tasks[i]);
+                    case "bye" -> {
+                        System.out.println("Bye. Hope to see you again soon!");
+                        shouldExit = true;
                     }
-                }
-                case "mark" -> {
-                    int taskIndex = Parser.parseTaskIndex(input, "mark", taskCount);
-                    tasks[taskIndex].markAsDone();
-                    System.out.println("Nice! I've marked this task as done:");
-                    System.out.println("  " + tasks[taskIndex]);
-                }
-                case "unmark" -> {
-                    int taskIndex = Parser.parseTaskIndex(input, "unmark", taskCount);
-                    tasks[taskIndex].markAsNotDone();
-                    System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.println("  " + tasks[taskIndex]);
-                }
-                case "todo" ->
-                    taskCount = addTask(tasks, taskCount, Parser.parseTodo(input));
-                case "deadline" ->
-                    taskCount = addTask(tasks, taskCount, Parser.parseDeadline(input));
-                case "event" ->
-                    taskCount = addTask(tasks, taskCount, Parser.parseEvent(input));
-                default -> throw new ChrisException("I don't recognize that command. "
-                        + "Try todo, deadline, event, list, mark, unmark, or bye.");
+                    case "list" -> {
+                        System.out.println("Here are the tasks in your list:");
+                        for (int i = 0; i < tasks.size(); i++) {
+                            System.out.println((i + 1) + "." + tasks.get(i));
+                        }
+                    }
+                    case "mark" -> {
+                        int taskIndex = Parser.parseTaskIndex(input, "mark", tasks.size());
+                        tasks.get(taskIndex).markAsDone();
+                        System.out.println("Nice! I've marked this task as done:");
+                        System.out.println("  " + tasks.get(taskIndex));
+                    }
+                    case "unmark" -> {
+                        int taskIndex = Parser.parseTaskIndex(input, "unmark", tasks.size());
+                        tasks.get(taskIndex).markAsNotDone();
+                        System.out.println("OK, I've marked this task as not done yet:");
+                        System.out.println("  " + tasks.get(taskIndex));
+                    }
+                    case "delete" -> {
+                        int taskIndex = Parser.parseTaskIndex(input, "delete", tasks.size());
+                        Task removedTask = tasks.remove(taskIndex);
+                        System.out.println("Noted. I've removed this task:");
+                        System.out.println("  " + removedTask);
+                        showTaskCount(tasks.size());
+                    }
+                    case "todo" ->
+                        addTask(tasks, Parser.parseTodo(input));
+                    case "deadline" ->
+                        addTask(tasks, Parser.parseDeadline(input));
+                    case "event" ->
+                        addTask(tasks, Parser.parseEvent(input));
+                    default -> throw new ChrisException("I don't recognize that command. "
+                            + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
                 }
             } catch (ChrisException exception) {
                 System.out.println("OOPS!!! " + exception.getMessage());
@@ -84,20 +91,12 @@ public class Chris {
     /**
      * Stores a task and displays confirmation of the addition.
      *
-     * @param tasks Array in which tasks are stored.
-     * @param taskCount Number of tasks before the addition.
+     * @param tasks List in which tasks are stored.
      * @param task Task to add.
-     * @return Number of tasks after the addition.
-     * @throws ChrisException If the task list is full.
      */
-    private static int addTask(Task[] tasks, int taskCount, Task task) throws ChrisException {
-        if (taskCount >= tasks.length) {
-            throw new ChrisException("Your task list is full. Remove a task before adding another one.");
-        }
-        tasks[taskCount] = task;
-        int updatedTaskCount = taskCount + 1;
-        showTaskAdded(task, updatedTaskCount);
-        return updatedTaskCount;
+    private static void addTask(ArrayList<Task> tasks, Task task) {
+        tasks.add(task);
+        showTaskAdded(task, tasks.size());
     }
 
     /**
@@ -109,6 +108,16 @@ public class Chris {
     private static void showTaskAdded(Task task, int taskCount) {
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        showTaskCount(taskCount);
+    }
+
+    /**
+     * Displays the current number of tasks with correct singular or plural grammar.
+     *
+     * @param taskCount Current number of tasks.
+     */
+    private static void showTaskCount(int taskCount) {
+        String taskWord = taskCount == 1 ? "task" : "tasks";
+        System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
     }
 }
