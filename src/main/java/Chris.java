@@ -30,56 +30,74 @@ public class Chris {
         System.out.println(line);
 
         Scanner scanner = new Scanner(System.in);
-        while (true) {
-            String input = scanner.nextLine();
+        while (scanner.hasNextLine()) {
+            String input = scanner.nextLine().trim();
+            String command = input.isEmpty() ? "" : input.split("\\s+", 2)[0];
             System.out.println(line);
+            boolean shouldExit = false;
 
-            if (input.equals("bye")) {
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.println(line);
-                break;
-            } else if (input.equals("list")) {
-                System.out.println("Here are the tasks in your list:");
-                for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + "." + tasks[i]);
+            try {
+                switch (command) {
+                case "bye" -> {
+                    System.out.println("Bye. Hope to see you again soon!");
+                    shouldExit = true;
                 }
-            } else if (input.startsWith("mark ")) {
-                int taskNumber = Integer.parseInt(input.substring(5));
-                int taskIndex = taskNumber - 1;
-                tasks[taskIndex].markAsDone();
-                System.out.println("Nice! I've marked this task as done:");
-                System.out.println("  " + tasks[taskIndex]);
-            } else if (input.startsWith("unmark ")) {
-                int taskNumber = Integer.parseInt(input.substring(7));
-                int taskIndex = taskNumber - 1;
-                tasks[taskIndex].markAsNotDone();
-                System.out.println("OK, I've marked this task as not done yet:");
-                System.out.println("  " + tasks[taskIndex]);
-            } else if (input.startsWith("todo ")) {
-                Task task = new Todo(input.substring(5).trim());
-                tasks[taskCount] = task;
-                taskCount++;
-                showTaskAdded(task, taskCount);
-            } else if (input.startsWith("deadline ")) {
-                String details = input.substring(9);
-                String[] parts = details.split(" /by ", 2);
-                Task task = new Deadline(parts[0].trim(), parts[1].trim());
-                tasks[taskCount] = task;
-                taskCount++;
-                showTaskAdded(task, taskCount);
-            } else if (input.startsWith("event ")) {
-                String details = input.substring(6);
-                String[] fromParts = details.split(" /from ", 2);
-                String[] toParts = fromParts[1].split(" /to ", 2);
-                Task task = new Event(fromParts[0].trim(), toParts[0].trim(), toParts[1].trim());
-                tasks[taskCount] = task;
-                taskCount++;
-                showTaskAdded(task, taskCount);
+                case "list" -> {
+                    System.out.println("Here are the tasks in your list:");
+                    for (int i = 0; i < taskCount; i++) {
+                        System.out.println((i + 1) + "." + tasks[i]);
+                    }
+                }
+                case "mark" -> {
+                    int taskIndex = Parser.parseTaskIndex(input, "mark", taskCount);
+                    tasks[taskIndex].markAsDone();
+                    System.out.println("Nice! I've marked this task as done:");
+                    System.out.println("  " + tasks[taskIndex]);
+                }
+                case "unmark" -> {
+                    int taskIndex = Parser.parseTaskIndex(input, "unmark", taskCount);
+                    tasks[taskIndex].markAsNotDone();
+                    System.out.println("OK, I've marked this task as not done yet:");
+                    System.out.println("  " + tasks[taskIndex]);
+                }
+                case "todo" ->
+                    taskCount = addTask(tasks, taskCount, Parser.parseTodo(input));
+                case "deadline" ->
+                    taskCount = addTask(tasks, taskCount, Parser.parseDeadline(input));
+                case "event" ->
+                    taskCount = addTask(tasks, taskCount, Parser.parseEvent(input));
+                default -> throw new ChrisException("I don't recognize that command. "
+                        + "Try todo, deadline, event, list, mark, unmark, or bye.");
+                }
+            } catch (ChrisException exception) {
+                System.out.println("OOPS!!! " + exception.getMessage());
             }
 
             System.out.println(line);
+            if (shouldExit) {
+                break;
+            }
         }
         scanner.close();
+    }
+
+    /**
+     * Stores a task and displays confirmation of the addition.
+     *
+     * @param tasks Array in which tasks are stored.
+     * @param taskCount Number of tasks before the addition.
+     * @param task Task to add.
+     * @return Number of tasks after the addition.
+     * @throws ChrisException If the task list is full.
+     */
+    private static int addTask(Task[] tasks, int taskCount, Task task) throws ChrisException {
+        if (taskCount >= tasks.length) {
+            throw new ChrisException("Your task list is full. Remove a task before adding another one.");
+        }
+        tasks[taskCount] = task;
+        int updatedTaskCount = taskCount + 1;
+        showTaskAdded(task, updatedTaskCount);
+        return updatedTaskCount;
     }
 
     /**
