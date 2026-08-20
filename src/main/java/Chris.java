@@ -32,48 +32,49 @@ public class Chris {
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine().trim();
-            String command = input.isEmpty() ? "" : input.split("\\s+", 2)[0];
+            String commandWord = input.isEmpty() ? "" : input.split("\\s+", 2)[0];
+            CommandType commandType = CommandType.parseCommandWord(commandWord);
             System.out.println(line);
             boolean shouldExit = false;
 
             try {
-                switch (command) {
-                    case "bye" -> {
+                switch (commandType) {
+                    case BYE -> {
                         System.out.println("Bye. Hope to see you again soon!");
                         shouldExit = true;
                     }
-                    case "list" -> {
+                    case LIST -> {
                         System.out.println("Here are the tasks in your list:");
                         for (int i = 0; i < tasks.size(); i++) {
                             System.out.println((i + 1) + "." + tasks.get(i));
                         }
                     }
-                    case "mark" -> {
-                        int taskIndex = Parser.parseTaskIndex(input, "mark", tasks.size());
+                    case MARK -> {
+                        int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
                         tasks.get(taskIndex).markAsDone();
                         System.out.println("Nice! I've marked this task as done:");
                         System.out.println("  " + tasks.get(taskIndex));
                     }
-                    case "unmark" -> {
-                        int taskIndex = Parser.parseTaskIndex(input, "unmark", tasks.size());
+                    case UNMARK -> {
+                        int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
                         tasks.get(taskIndex).markAsNotDone();
                         System.out.println("OK, I've marked this task as not done yet:");
                         System.out.println("  " + tasks.get(taskIndex));
                     }
-                    case "delete" -> {
-                        int taskIndex = Parser.parseTaskIndex(input, "delete", tasks.size());
+                    case DELETE -> {
+                        int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
                         Task removedTask = tasks.remove(taskIndex);
                         System.out.println("Noted. I've removed this task:");
                         System.out.println("  " + removedTask);
                         showTaskCount(tasks.size());
                     }
-                    case "todo" ->
+                    case TODO ->
                         addTask(tasks, Parser.parseTodo(input));
-                    case "deadline" ->
+                    case DEADLINE ->
                         addTask(tasks, Parser.parseDeadline(input));
-                    case "event" ->
+                    case EVENT ->
                         addTask(tasks, Parser.parseEvent(input));
-                    default -> throw new ChrisException("I don't recognize that command. "
+                    case UNKNOWN -> throw new ChrisException("I don't recognize that command. "
                             + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
                 }
             } catch (ChrisException exception) {
