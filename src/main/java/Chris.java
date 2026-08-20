@@ -9,6 +9,9 @@ public class Chris {
                 + " \\____|_| |_|_|  |_|___/";
         String line = "____________________________________________________________";
 
+        String[] tasks = new String[100];
+        int taskCount = 0;
+
         System.out.println(line);
         System.out.println(banner);
         System.out.println("Hello! I'm Chris.");
@@ -24,9 +27,16 @@ public class Chris {
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.println(line);
                 break;
+            } else if (input.equals("list")) {
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println((i + 1) + ". " + tasks[i]);
+                }
+            } else {
+                tasks[taskCount] = input;
+                taskCount++;
+                System.out.println("added: " + input);
             }
 
-            System.out.println(input);
             System.out.println(line);
         }
         scanner.close();
