@@ -2,7 +2,10 @@
  * Represents a task with a description and completion status.
  */
 public class Task {
+    /** Description of this task. */
     protected String description;
+
+    /** Whether this task has been completed. */
     protected boolean isDone;
 
     /**
