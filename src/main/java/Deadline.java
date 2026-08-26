@@ -17,6 +17,16 @@ public class Deadline extends Task {
     }
 
     /**
+     * Returns this deadline task in the format used for persistent storage.
+     *
+     * @return Serialized deadline task.
+     */
+    @Override
+    public String toDataString() {
+        return "D | " + getStatusNumber() + " | " + this.description + " | " + this.by;
+    }
+
+    /**
      * Returns this deadline task in its display format.
      *
      * @return The deadline type, status, description, and deadline information.

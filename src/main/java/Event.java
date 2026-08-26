@@ -22,6 +22,17 @@ public class Event extends Task {
     }
 
     /**
+     * Returns this event task in the format used for persistent storage.
+     *
+     * @return Serialized event task.
+     */
+    @Override
+    public String toDataString() {
+        return "E | " + getStatusNumber() + " | " + this.description
+                + " | " + this.from + " | " + this.to;
+    }
+
+    /**
      * Returns this event task in its display format.
      *
      * @return The event type, status, description, and timing information.

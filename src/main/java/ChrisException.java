@@ -1,5 +1,5 @@
 /**
- * Represents an error caused by an invalid command entered by the user.
+ * Represents an error that the chatbot can explain to the user.
  */
 public class ChrisException extends Exception {
     private static final long serialVersionUID = 1L;
@@ -11,5 +11,15 @@ public class ChrisException extends Exception {
      */
     public ChrisException(String message) {
         super(message);
+    }
+
+    /**
+     * Creates an exception with a user-facing explanation and its underlying cause.
+     *
+     * @param message Explanation of the error.
+     * @param cause Underlying cause of the error.
+     */
+    public ChrisException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
