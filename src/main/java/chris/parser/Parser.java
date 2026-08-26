@@ -1,5 +1,12 @@
+package chris.parser;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+
+import chris.exception.ChrisException;
+import chris.task.Deadline;
+import chris.task.Event;
+import chris.task.Todo;
 
 /**
  * Parses and validates commands entered by the user.

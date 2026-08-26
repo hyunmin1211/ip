@@ -1,4 +1,9 @@
+package chris.ui;
+
 import java.util.Scanner;
+
+import chris.task.Task;
+import chris.task.TaskList;
 
 /**
  * Handles console input and output for the chatbot.
