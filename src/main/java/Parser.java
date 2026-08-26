@@ -1,3 +1,6 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 /**
  * Parses and validates commands entered by the user.
  */
@@ -31,18 +34,24 @@ public final class Parser {
         String details = input.substring("deadline".length()).trim();
         int byPosition = details.indexOf("/by");
         if (byPosition < 0) {
-            throw new ChrisException("A deadline needs '/by'. Try: deadline return book /by Sunday");
+            throw new ChrisException("A deadline needs '/by'. Try: deadline return book /by 2019-12-02");
         }
 
         String description = details.substring(0, byPosition).trim();
-        String by = details.substring(byPosition + "/by".length()).trim();
+        String byText = details.substring(byPosition + "/by".length()).trim();
         if (description.isEmpty()) {
             throw new ChrisException("I need a description before '/by'.");
         }
-        if (by.isEmpty()) {
-            throw new ChrisException("I need deadline information after '/by'.");
+        if (byText.isEmpty()) {
+            throw new ChrisException("I need a date after '/by'. Use yyyy-MM-dd.");
         }
-        return new Deadline(description, by);
+
+        try {
+            LocalDate by = LocalDate.parse(byText);
+            return new Deadline(description, by);
+        } catch (DateTimeParseException exception) {
+            throw new ChrisException("That date is invalid. Use yyyy-MM-dd, for example 2019-12-02.");
+        }
     }
 
     /**

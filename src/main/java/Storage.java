@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,12 +75,17 @@ public class Storage {
         String[] fields = line.split("\\s*\\|\\s*", -1);
         validateStoredTask(fields, lineNumber);
 
-        Task task = switch (fields[0]) {
-            case "T" -> new Todo(fields[2]);
-            case "D" -> new Deadline(fields[2], fields[3]);
-            case "E" -> new Event(fields[2], fields[3], fields[4]);
-            default -> throw corruptedDataException(lineNumber);
-        };
+        Task task;
+        try {
+            task = switch (fields[0]) {
+                case "T" -> new Todo(fields[2]);
+                case "D" -> new Deadline(fields[2], LocalDate.parse(fields[3]));
+                case "E" -> new Event(fields[2], fields[3], fields[4]);
+                default -> throw corruptedDataException(lineNumber);
+            };
+        } catch (DateTimeParseException exception) {
+            throw corruptedDataException(lineNumber);
+        }
 
         if (fields[1].equals("1")) {
             task.markAsDone();
