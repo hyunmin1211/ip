@@ -1,3 +1,4 @@
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -21,7 +22,8 @@ public class Chris {
                 + " \\____|_| |_|_|  |_|___/";
         String line = "____________________________________________________________";
 
-        ArrayList<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage(Path.of("data", "chris.txt"));
+        ArrayList<Task> tasks = loadTasks(storage);
 
         System.out.println(line);
         System.out.println(banner);
@@ -52,28 +54,31 @@ public class Chris {
                     case MARK -> {
                         int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
                         tasks.get(taskIndex).markAsDone();
+                        storage.saveTasks(tasks);
                         System.out.println("Nice! I've marked this task as done:");
                         System.out.println("  " + tasks.get(taskIndex));
                     }
                     case UNMARK -> {
                         int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
                         tasks.get(taskIndex).markAsNotDone();
+                        storage.saveTasks(tasks);
                         System.out.println("OK, I've marked this task as not done yet:");
                         System.out.println("  " + tasks.get(taskIndex));
                     }
                     case DELETE -> {
                         int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
                         Task removedTask = tasks.remove(taskIndex);
+                        storage.saveTasks(tasks);
                         System.out.println("Noted. I've removed this task:");
                         System.out.println("  " + removedTask);
                         showTaskCount(tasks.size());
                     }
                     case TODO ->
-                        addTask(tasks, Parser.parseTodo(input));
+                        addTask(tasks, Parser.parseTodo(input), storage);
                     case DEADLINE ->
-                        addTask(tasks, Parser.parseDeadline(input));
+                        addTask(tasks, Parser.parseDeadline(input), storage);
                     case EVENT ->
-                        addTask(tasks, Parser.parseEvent(input));
+                        addTask(tasks, Parser.parseEvent(input), storage);
                     case UNKNOWN -> throw new ChrisException("I don't recognize that command. "
                             + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
                 }
@@ -90,13 +95,31 @@ public class Chris {
     }
 
     /**
+     * Loads saved tasks, or starts with an empty list if loading fails.
+     *
+     * @param storage Storage from which tasks are loaded.
+     * @return Loaded tasks, or an empty list when the data cannot be loaded.
+     */
+    private static ArrayList<Task> loadTasks(Storage storage) {
+        try {
+            return storage.loadTasks();
+        } catch (ChrisException exception) {
+            System.out.println("OOPS!!! " + exception.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Stores a task and displays confirmation of the addition.
      *
      * @param tasks List in which tasks are stored.
      * @param task Task to add.
+     * @param storage Storage to update after adding the task.
+     * @throws ChrisException If the updated task list cannot be saved.
      */
-    private static void addTask(ArrayList<Task> tasks, Task task) {
+    private static void addTask(ArrayList<Task> tasks, Task task, Storage storage) throws ChrisException {
         tasks.add(task);
+        storage.saveTasks(tasks);
         showTaskAdded(task, tasks.size());
     }
 

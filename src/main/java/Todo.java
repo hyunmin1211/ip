@@ -12,6 +12,16 @@ public class Todo extends Task {
     }
 
     /**
+     * Returns this todo task in the format used for persistent storage.
+     *
+     * @return Serialized todo task.
+     */
+    @Override
+    public String toDataString() {
+        return "T | " + getStatusNumber() + " | " + this.description;
+    }
+
+    /**
      * Returns this todo task in its display format.
      *
      * @return The todo type, status, and description.
