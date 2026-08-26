@@ -1,5 +1,4 @@
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -23,7 +22,7 @@ public class Chris {
         String line = "____________________________________________________________";
 
         Storage storage = new Storage(Path.of("data", "chris.txt"));
-        ArrayList<Task> tasks = loadTasks(storage);
+        TaskList tasks = loadTasks(storage);
 
         System.out.println(line);
         System.out.println(banner);
@@ -53,22 +52,22 @@ public class Chris {
                     }
                     case MARK -> {
                         int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
-                        tasks.get(taskIndex).markAsDone();
-                        storage.saveTasks(tasks);
+                        Task markedTask = tasks.mark(taskIndex);
+                        storage.saveTasks(tasks.asList());
                         System.out.println("Nice! I've marked this task as done:");
-                        System.out.println("  " + tasks.get(taskIndex));
+                        System.out.println("  " + markedTask);
                     }
                     case UNMARK -> {
                         int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
-                        tasks.get(taskIndex).markAsNotDone();
-                        storage.saveTasks(tasks);
+                        Task unmarkedTask = tasks.unmark(taskIndex);
+                        storage.saveTasks(tasks.asList());
                         System.out.println("OK, I've marked this task as not done yet:");
-                        System.out.println("  " + tasks.get(taskIndex));
+                        System.out.println("  " + unmarkedTask);
                     }
                     case DELETE -> {
                         int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
-                        Task removedTask = tasks.remove(taskIndex);
-                        storage.saveTasks(tasks);
+                        Task removedTask = tasks.delete(taskIndex);
+                        storage.saveTasks(tasks.asList());
                         System.out.println("Noted. I've removed this task:");
                         System.out.println("  " + removedTask);
                         showTaskCount(tasks.size());
@@ -100,12 +99,12 @@ public class Chris {
      * @param storage Storage from which tasks are loaded.
      * @return Loaded tasks, or an empty list when the data cannot be loaded.
      */
-    private static ArrayList<Task> loadTasks(Storage storage) {
+    private static TaskList loadTasks(Storage storage) {
         try {
-            return storage.loadTasks();
+            return new TaskList(storage.loadTasks());
         } catch (ChrisException exception) {
             System.out.println("OOPS!!! " + exception.getMessage());
-            return new ArrayList<>();
+            return new TaskList();
         }
     }
 
@@ -117,9 +116,9 @@ public class Chris {
      * @param storage Storage to update after adding the task.
      * @throws ChrisException If the updated task list cannot be saved.
      */
-    private static void addTask(ArrayList<Task> tasks, Task task, Storage storage) throws ChrisException {
+    private static void addTask(TaskList tasks, Task task, Storage storage) throws ChrisException {
         tasks.add(task);
-        storage.saveTasks(tasks);
+        storage.saveTasks(tasks.asList());
         showTaskAdded(task, tasks.size());
     }
 
