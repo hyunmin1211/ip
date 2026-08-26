@@ -9,6 +9,17 @@ public final class Parser {
     }
 
     /**
+     * Identifies the command represented by the user's input.
+     *
+     * @param input Complete user input.
+     * @return Type of command entered by the user.
+     */
+    public static CommandType parseCommandType(String input) {
+        String commandWord = input.isEmpty() ? "" : input.split("\\s+", 2)[0];
+        return CommandType.parseCommandWord(commandWord);
+    }
+
+    /**
      * Creates a todo task from a todo command.
      *
      * @param input Complete todo command.
