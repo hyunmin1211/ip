@@ -1,147 +1,108 @@
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
- * Runs the Chris chatbot and handles user commands.
+ * Coordinates the chatbot's UI, task list, parser, and storage components.
  */
 public class Chris {
-    private Chris() {
+    private final Ui ui;
+    private final Storage storage;
+    private final TaskList tasks;
+
+    /**
+     * Creates a chatbot that stores tasks at the specified file path.
+     *
+     * @param filePath Path to the task data file.
+     */
+    public Chris(Path filePath) {
+        this.ui = new Ui();
+        this.storage = new Storage(filePath);
+        this.tasks = loadTasks();
     }
 
     /**
-     * Starts the chatbot command loop.
+     * Runs the chatbot command loop until the user exits or input ends.
+     */
+    public void run() {
+        this.ui.showWelcome();
+        boolean shouldExit = false;
+
+        while (!shouldExit && this.ui.hasNextCommand()) {
+            String input = this.ui.readCommand();
+            this.ui.showLine();
+            try {
+                shouldExit = executeCommand(input);
+            } catch (ChrisException exception) {
+                this.ui.showError(exception.getMessage());
+            } finally {
+                this.ui.showLine();
+            }
+        }
+        this.ui.close();
+    }
+
+    private boolean executeCommand(String input) throws ChrisException {
+        CommandType commandType = Parser.parseCommandType(input);
+        switch (commandType) {
+            case BYE -> this.ui.showGoodbye();
+            case LIST -> this.ui.showTaskList(this.tasks);
+            case MARK -> markTask(input, commandType);
+            case UNMARK -> unmarkTask(input, commandType);
+            case DELETE -> deleteTask(input, commandType);
+            case TODO -> addTask(Parser.parseTodo(input));
+            case DEADLINE -> addTask(Parser.parseDeadline(input));
+            case EVENT -> addTask(Parser.parseEvent(input));
+            case UNKNOWN -> throw new ChrisException("I don't recognize that command. "
+                    + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+        }
+        return commandType == CommandType.BYE;
+    }
+
+    private void markTask(String input, CommandType commandType) throws ChrisException {
+        int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), this.tasks.size());
+        Task markedTask = this.tasks.mark(taskIndex);
+        saveTasks();
+        this.ui.showTaskMarked(markedTask);
+    }
+
+    private void unmarkTask(String input, CommandType commandType) throws ChrisException {
+        int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), this.tasks.size());
+        Task unmarkedTask = this.tasks.unmark(taskIndex);
+        saveTasks();
+        this.ui.showTaskUnmarked(unmarkedTask);
+    }
+
+    private void deleteTask(String input, CommandType commandType) throws ChrisException {
+        int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), this.tasks.size());
+        Task removedTask = this.tasks.delete(taskIndex);
+        saveTasks();
+        this.ui.showTaskDeleted(removedTask, this.tasks.size());
+    }
+
+    private void addTask(Task task) throws ChrisException {
+        this.tasks.add(task);
+        saveTasks();
+        this.ui.showTaskAdded(task, this.tasks.size());
+    }
+
+    private void saveTasks() throws ChrisException {
+        this.storage.saveTasks(this.tasks.asList());
+    }
+
+    private TaskList loadTasks() {
+        try {
+            return new TaskList(this.storage.loadTasks());
+        } catch (ChrisException exception) {
+            this.ui.showError(exception.getMessage());
+            return new TaskList();
+        }
+    }
+
+    /**
+     * Starts the chatbot using the default relative data-file path.
      *
      * @param args Command-line arguments; not used.
      */
     public static void main(String[] args) {
-        String banner = "  ____ _          _     \n"
-                + " / ___| |__  _ __(_)___ \n"
-                + "| |   | '_ \\| '__| / __|\n"
-                + "| |___| | | | |  | \\__ \\\n"
-                + " \\____|_| |_|_|  |_|___/";
-        String line = "____________________________________________________________";
-
-        Storage storage = new Storage(Path.of("data", "chris.txt"));
-        ArrayList<Task> tasks = loadTasks(storage);
-
-        System.out.println(line);
-        System.out.println(banner);
-        System.out.println("Hello! I'm Chris.");
-        System.out.println("What can I do for you?");
-        System.out.println(line);
-
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine().trim();
-            String commandWord = input.isEmpty() ? "" : input.split("\\s+", 2)[0];
-            CommandType commandType = CommandType.parseCommandWord(commandWord);
-            System.out.println(line);
-            boolean shouldExit = false;
-
-            try {
-                switch (commandType) {
-                    case BYE -> {
-                        System.out.println("Bye. Hope to see you again soon!");
-                        shouldExit = true;
-                    }
-                    case LIST -> {
-                        System.out.println("Here are the tasks in your list:");
-                        for (int i = 0; i < tasks.size(); i++) {
-                            System.out.println((i + 1) + "." + tasks.get(i));
-                        }
-                    }
-                    case MARK -> {
-                        int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
-                        tasks.get(taskIndex).markAsDone();
-                        storage.saveTasks(tasks);
-                        System.out.println("Nice! I've marked this task as done:");
-                        System.out.println("  " + tasks.get(taskIndex));
-                    }
-                    case UNMARK -> {
-                        int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
-                        tasks.get(taskIndex).markAsNotDone();
-                        storage.saveTasks(tasks);
-                        System.out.println("OK, I've marked this task as not done yet:");
-                        System.out.println("  " + tasks.get(taskIndex));
-                    }
-                    case DELETE -> {
-                        int taskIndex = Parser.parseTaskIndex(input, commandType.getCommandWord(), tasks.size());
-                        Task removedTask = tasks.remove(taskIndex);
-                        storage.saveTasks(tasks);
-                        System.out.println("Noted. I've removed this task:");
-                        System.out.println("  " + removedTask);
-                        showTaskCount(tasks.size());
-                    }
-                    case TODO ->
-                        addTask(tasks, Parser.parseTodo(input), storage);
-                    case DEADLINE ->
-                        addTask(tasks, Parser.parseDeadline(input), storage);
-                    case EVENT ->
-                        addTask(tasks, Parser.parseEvent(input), storage);
-                    case UNKNOWN -> throw new ChrisException("I don't recognize that command. "
-                            + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
-                }
-            } catch (ChrisException exception) {
-                System.out.println("OOPS!!! " + exception.getMessage());
-            }
-
-            System.out.println(line);
-            if (shouldExit) {
-                break;
-            }
-        }
-        scanner.close();
-    }
-
-    /**
-     * Loads saved tasks, or starts with an empty list if loading fails.
-     *
-     * @param storage Storage from which tasks are loaded.
-     * @return Loaded tasks, or an empty list when the data cannot be loaded.
-     */
-    private static ArrayList<Task> loadTasks(Storage storage) {
-        try {
-            return storage.loadTasks();
-        } catch (ChrisException exception) {
-            System.out.println("OOPS!!! " + exception.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * Stores a task and displays confirmation of the addition.
-     *
-     * @param tasks List in which tasks are stored.
-     * @param task Task to add.
-     * @param storage Storage to update after adding the task.
-     * @throws ChrisException If the updated task list cannot be saved.
-     */
-    private static void addTask(ArrayList<Task> tasks, Task task, Storage storage) throws ChrisException {
-        tasks.add(task);
-        storage.saveTasks(tasks);
-        showTaskAdded(task, tasks.size());
-    }
-
-    /**
-     * Displays confirmation that a task was added.
-     *
-     * @param task Task that was added.
-     * @param taskCount Number of tasks after the addition.
-     */
-    private static void showTaskAdded(Task task, int taskCount) {
-        System.out.println("Got it. I've added this task:");
-        System.out.println("  " + task);
-        showTaskCount(taskCount);
-    }
-
-    /**
-     * Displays the current number of tasks with correct singular or plural grammar.
-     *
-     * @param taskCount Current number of tasks.
-     */
-    private static void showTaskCount(int taskCount) {
-        String taskWord = taskCount == 1 ? "task" : "tasks";
-        System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
+        new Chris(Path.of("data", "chris.txt")).run();
     }
 }
