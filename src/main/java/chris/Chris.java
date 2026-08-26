@@ -1,4 +1,14 @@
+package chris;
+
 import java.nio.file.Path;
+
+import chris.exception.ChrisException;
+import chris.parser.CommandType;
+import chris.parser.Parser;
+import chris.storage.Storage;
+import chris.task.Task;
+import chris.task.TaskList;
+import chris.ui.Ui;
 
 /**
  * Coordinates the chatbot's UI, task list, parser, and storage components.

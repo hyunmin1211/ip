@@ -1,3 +1,5 @@
+package chris.parser;
+
 /**
  * Represents a command supported by the Chris chatbot.
  */

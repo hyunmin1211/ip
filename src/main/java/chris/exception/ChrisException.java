@@ -1,3 +1,5 @@
+package chris.exception;
+
 /**
  * Represents an error that the chatbot can explain to the user.
  */
