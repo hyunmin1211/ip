@@ -1,5 +1,6 @@
 package chris.ui;
 
+import java.util.List;
 import java.util.Scanner;
 
 import chris.task.Task;
@@ -77,6 +78,18 @@ public class Ui {
         System.out.println("Here are the tasks in your list:");
         for (int index = 0; index < tasks.size(); index++) {
             System.out.println((index + 1) + "." + tasks.get(index));
+        }
+    }
+
+    /**
+     * Displays tasks that match a search keyword.
+     *
+     * @param matchingTasks Matching tasks to display.
+     */
+    public void showMatchingTasks(List<Task> matchingTasks) {
+        System.out.println("Here are the matching tasks in your list:");
+        for (int index = 0; index < matchingTasks.size(); index++) {
+            System.out.println((index + 1) + "." + matchingTasks.get(index));
         }
     }
 
