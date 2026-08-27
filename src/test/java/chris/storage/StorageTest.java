@@ -16,10 +16,18 @@ import chris.task.Deadline;
 import chris.task.Task;
 import chris.task.Todo;
 
+/**
+ * Tests loading and saving tasks through file storage.
+ */
 public class StorageTest {
     @TempDir
     private Path temporaryDirectory;
 
+    /**
+     * Verifies that loading from a missing file produces an empty task list.
+     *
+     * @throws ChrisException If loading unexpectedly fails.
+     */
     @Test
     public void loadTasks_missingFile_returnsEmptyList() throws ChrisException {
         Storage storage = new Storage(this.temporaryDirectory.resolve("missing.txt"));
@@ -27,6 +35,11 @@ public class StorageTest {
         assertTrue(storage.loadTasks().isEmpty());
     }
 
+    /**
+     * Verifies that saved tasks and their completion states can be restored.
+     *
+     * @throws ChrisException If saving or loading unexpectedly fails.
+     */
     @Test
     public void saveAndLoadTasks_validTasks_restoresTasks() throws ChrisException {
         Storage storage = new Storage(this.temporaryDirectory.resolve("data").resolve("chris.txt"));
