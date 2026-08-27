@@ -33,3 +33,23 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
    ```
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+
+## Building with Gradle
+
+Run the following command from the project root to test the project and create the executable JAR file:
+
+```shell
+./gradlew clean test shadowJar
+```
+
+The generated JAR file is located at `build/libs/chris.jar`.
+
+## Running the JAR File
+
+Copy `chris.jar` into an empty folder, open a terminal in that folder, and run:
+
+```shell
+java -jar "chris.jar"
+```
+
+Chris creates its task data at `data/chris.txt`, relative to the folder from which the JAR is run. The generated JAR file should not be committed to Git; distribute it through a GitHub release instead.
