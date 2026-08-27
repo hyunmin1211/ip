@@ -27,6 +27,21 @@ public final class Parser {
     }
 
     /**
+     * Extracts and validates the keyword from a find command.
+     *
+     * @param input Complete find command.
+     * @return Keyword to search for.
+     * @throws ChrisException If the keyword is empty.
+     */
+    public static String parseFindKeyword(String input) throws ChrisException {
+        String keyword = input.substring("find".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new ChrisException("Tell me what to find. Try: find book");
+        }
+        return keyword;
+    }
+
+    /**
      * Creates a todo task from a todo command.
      *
      * @param input Complete todo command.

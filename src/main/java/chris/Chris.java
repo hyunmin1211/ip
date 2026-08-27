@@ -55,6 +55,7 @@ public class Chris {
         switch (commandType) {
             case BYE -> this.ui.showGoodbye();
             case LIST -> this.ui.showTaskList(this.tasks);
+            case FIND -> this.ui.showMatchingTasks(this.tasks.find(Parser.parseFindKeyword(input)));
             case MARK -> markTask(input, commandType);
             case UNMARK -> unmarkTask(input, commandType);
             case DELETE -> deleteTask(input, commandType);
@@ -62,7 +63,7 @@ public class Chris {
             case DEADLINE -> addTask(Parser.parseDeadline(input));
             case EVENT -> addTask(Parser.parseEvent(input));
             case UNKNOWN -> throw new ChrisException("I don't recognize that command. "
-                    + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+                    + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
         }
         return commandType == CommandType.BYE;
     }

@@ -44,6 +44,16 @@ public abstract class Task {
     }
 
     /**
+     * Returns whether this task's description contains the specified keyword.
+     *
+     * @param keyword Keyword to search for.
+     * @return {@code true} if the description contains the keyword.
+     */
+    public boolean containsKeyword(String keyword) {
+        return this.description.contains(keyword);
+    }
+
+    /**
      * Returns the numeric completion status used in the data file.
      *
      * @return {@code 1} if completed, or {@code 0} otherwise.
