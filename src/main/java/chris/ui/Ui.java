@@ -31,10 +31,19 @@ public class Ui {
      */
     public void showWelcome() {
         showLine();
-        System.out.println(BANNER);
-        System.out.println("Hello! I'm Chris.");
-        System.out.println("What can I do for you?");
+        showMessage(getWelcomeMessage());
         showLine();
+    }
+
+    /**
+     * Returns the chatbot banner and greeting.
+     *
+     * @return Welcome message.
+     */
+    public String getWelcomeMessage() {
+        return BANNER + System.lineSeparator()
+                + "Hello! I'm Chris." + System.lineSeparator()
+                + "What can I do for you?";
     }
 
     /**
@@ -66,7 +75,16 @@ public class Ui {
      * Displays the farewell message.
      */
     public void showGoodbye() {
-        System.out.println("Bye. Hope to see you again soon!");
+        showMessage(getGoodbyeMessage());
+    }
+
+    /**
+     * Returns the chatbot farewell message.
+     *
+     * @return Farewell message.
+     */
+    public String getGoodbyeMessage() {
+        return "Bye. Hope to see you again soon!";
     }
 
     /**
@@ -75,10 +93,24 @@ public class Ui {
      * @param tasks Tasks to display.
      */
     public void showTaskList(TaskList tasks) {
-        System.out.println("Here are the tasks in your list:");
+        showMessage(formatTaskList(tasks));
+    }
+
+    /**
+     * Formats all tasks with one-based numbering.
+     *
+     * @param tasks Tasks to format.
+     * @return Formatted task list.
+     */
+    public String formatTaskList(TaskList tasks) {
+        StringBuilder response = new StringBuilder("Here are the tasks in your list:");
         for (int index = 0; index < tasks.size(); index++) {
-            System.out.println((index + 1) + "." + tasks.get(index));
+            response.append(System.lineSeparator())
+                    .append(index + 1)
+                    .append('.')
+                    .append(tasks.get(index));
         }
+        return response.toString();
     }
 
     /**
@@ -87,10 +119,24 @@ public class Ui {
      * @param matchingTasks Matching tasks to display.
      */
     public void showMatchingTasks(List<Task> matchingTasks) {
-        System.out.println("Here are the matching tasks in your list:");
+        showMessage(formatMatchingTasks(matchingTasks));
+    }
+
+    /**
+     * Formats tasks that match a search keyword.
+     *
+     * @param matchingTasks Matching tasks to format.
+     * @return Formatted matching tasks.
+     */
+    public String formatMatchingTasks(List<Task> matchingTasks) {
+        StringBuilder response = new StringBuilder("Here are the matching tasks in your list:");
         for (int index = 0; index < matchingTasks.size(); index++) {
-            System.out.println((index + 1) + "." + matchingTasks.get(index));
+            response.append(System.lineSeparator())
+                    .append(index + 1)
+                    .append('.')
+                    .append(matchingTasks.get(index));
         }
+        return response.toString();
     }
 
     /**
@@ -99,8 +145,17 @@ public class Ui {
      * @param task Updated task.
      */
     public void showTaskMarked(Task task) {
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + task);
+        showMessage(formatTaskMarked(task));
+    }
+
+    /**
+     * Formats confirmation that a task was completed.
+     *
+     * @param task Updated task.
+     * @return Task completion confirmation.
+     */
+    public String formatTaskMarked(Task task) {
+        return "Nice! I've marked this task as done:" + System.lineSeparator() + "  " + task;
     }
 
     /**
@@ -109,8 +164,17 @@ public class Ui {
      * @param task Updated task.
      */
     public void showTaskUnmarked(Task task) {
-        System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println("  " + task);
+        showMessage(formatTaskUnmarked(task));
+    }
+
+    /**
+     * Formats confirmation that a task was marked incomplete.
+     *
+     * @param task Updated task.
+     * @return Task status confirmation.
+     */
+    public String formatTaskUnmarked(Task task) {
+        return "OK, I've marked this task as not done yet:" + System.lineSeparator() + "  " + task;
     }
 
     /**
@@ -120,9 +184,20 @@ public class Ui {
      * @param taskCount Number of remaining tasks.
      */
     public void showTaskDeleted(Task task, int taskCount) {
-        System.out.println("Noted. I've removed this task:");
-        System.out.println("  " + task);
-        showTaskCount(taskCount);
+        showMessage(formatTaskDeleted(task, taskCount));
+    }
+
+    /**
+     * Formats confirmation that a task was removed.
+     *
+     * @param task Removed task.
+     * @param taskCount Number of remaining tasks.
+     * @return Task deletion confirmation.
+     */
+    public String formatTaskDeleted(Task task, int taskCount) {
+        return "Noted. I've removed this task:" + System.lineSeparator()
+                + "  " + task + System.lineSeparator()
+                + formatTaskCount(taskCount);
     }
 
     /**
@@ -132,9 +207,20 @@ public class Ui {
      * @param taskCount Number of stored tasks.
      */
     public void showTaskAdded(Task task, int taskCount) {
-        System.out.println("Got it. I've added this task:");
-        System.out.println("  " + task);
-        showTaskCount(taskCount);
+        showMessage(formatTaskAdded(task, taskCount));
+    }
+
+    /**
+     * Formats confirmation that a task was added.
+     *
+     * @param task Added task.
+     * @param taskCount Number of stored tasks.
+     * @return Task addition confirmation.
+     */
+    public String formatTaskAdded(Task task, int taskCount) {
+        return "Got it. I've added this task:" + System.lineSeparator()
+                + "  " + task + System.lineSeparator()
+                + formatTaskCount(taskCount);
     }
 
     /**
@@ -143,7 +229,26 @@ public class Ui {
      * @param message Explanation of the error.
      */
     public void showError(String message) {
-        System.out.println("OOPS!!! " + message);
+        showMessage(formatError(message));
+    }
+
+    /**
+     * Formats a user-facing error message.
+     *
+     * @param message Explanation of the error.
+     * @return Formatted error message.
+     */
+    public String formatError(String message) {
+        return "OOPS!!! " + message;
+    }
+
+    /**
+     * Displays a complete chatbot response.
+     *
+     * @param message Response to display.
+     */
+    public void showMessage(String message) {
+        System.out.println(message);
     }
 
     /**
@@ -153,8 +258,8 @@ public class Ui {
         this.scanner.close();
     }
 
-    private void showTaskCount(int taskCount) {
+    private String formatTaskCount(int taskCount) {
         String taskWord = taskCount == 1 ? "task" : "tasks";
-        System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
+        return "Now you have " + taskCount + " " + taskWord + " in the list.";
     }
 }
