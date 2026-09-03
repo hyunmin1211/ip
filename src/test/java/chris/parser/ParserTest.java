@@ -29,7 +29,7 @@ public class ParserTest {
      */
     @Test
     public void parseDeadline_invalidDate_throwsChrisException() {
-        assertThrows(ChrisException.class,
-                () -> Parser.parseDeadline("deadline return book /by 2019-02-30"));
+        assertThrows(ChrisException.class, () ->
+                Parser.parseDeadline("deadline return book /by 2019-02-30"));
     }
 }

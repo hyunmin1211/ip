@@ -64,6 +64,7 @@ public class Chris {
             case EVENT -> addTask(Parser.parseEvent(input));
             case UNKNOWN -> throw new ChrisException("I don't recognize that command. "
                     + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
+            default -> throw new AssertionError("Unhandled command type: " + commandType);
         }
         return commandType == CommandType.BYE;
     }
