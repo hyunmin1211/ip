@@ -1,6 +1,7 @@
 package chris.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -9,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests task-list search behavior.
+ * Tests task-list behavior.
  */
 public class TaskListTest {
     /**
@@ -37,5 +38,17 @@ public class TaskListTest {
         TaskList tasks = new TaskList(List.of(new Todo("exercise")));
 
         assertTrue(tasks.find("book").isEmpty());
+    }
+
+    /**
+     * Verifies that an invalid internal task index violates the task-list precondition.
+     */
+    @Test
+    public void delete_invalidIndex_throwsAssertionError() {
+        TaskList tasks = new TaskList();
+
+        AssertionError exception = assertThrows(AssertionError.class, () -> tasks.delete(0));
+
+        assertEquals("Task index should be within the task list: 0", exception.getMessage());
     }
 }
