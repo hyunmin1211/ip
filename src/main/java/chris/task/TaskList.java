@@ -43,6 +43,7 @@ public class TaskList {
      * @return Removed task.
      */
     public Task delete(int index) {
+        assertValidIndex(index);
         return this.tasks.remove(index);
     }
 
@@ -53,6 +54,7 @@ public class TaskList {
      * @return Updated task.
      */
     public Task mark(int index) {
+        assertValidIndex(index);
         Task task = this.tasks.get(index);
         task.markAsDone();
         return task;
@@ -65,6 +67,7 @@ public class TaskList {
      * @return Updated task.
      */
     public Task unmark(int index) {
+        assertValidIndex(index);
         Task task = this.tasks.get(index);
         task.markAsNotDone();
         return task;
@@ -77,6 +80,7 @@ public class TaskList {
      * @return Task at the specified index.
      */
     public Task get(int index) {
+        assertValidIndex(index);
         return this.tasks.get(index);
     }
 
@@ -108,5 +112,10 @@ public class TaskList {
      */
     public List<Task> asList() {
         return Collections.unmodifiableList(this.tasks);
+    }
+
+    private void assertValidIndex(int index) {
+        assert index >= 0 && index < this.tasks.size()
+                : "Task index should be within the task list: " + index;
     }
 }
