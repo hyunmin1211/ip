@@ -72,13 +72,6 @@ public class Ui {
     }
 
     /**
-     * Displays the farewell message.
-     */
-    public void showGoodbye() {
-        showMessage(getGoodbyeMessage());
-    }
-
-    /**
      * Returns the chatbot farewell message.
      *
      * @return Farewell message.
@@ -88,38 +81,13 @@ public class Ui {
     }
 
     /**
-     * Displays all tasks with one-based numbering.
-     *
-     * @param tasks Tasks to display.
-     */
-    public void showTaskList(TaskList tasks) {
-        showMessage(formatTaskList(tasks));
-    }
-
-    /**
      * Formats all tasks with one-based numbering.
      *
      * @param tasks Tasks to format.
      * @return Formatted task list.
      */
     public String formatTaskList(TaskList tasks) {
-        StringBuilder response = new StringBuilder("Here are the tasks in your list:");
-        for (int index = 0; index < tasks.size(); index++) {
-            response.append(System.lineSeparator())
-                    .append(index + 1)
-                    .append('.')
-                    .append(tasks.get(index));
-        }
-        return response.toString();
-    }
-
-    /**
-     * Displays tasks that match a search keyword.
-     *
-     * @param matchingTasks Matching tasks to display.
-     */
-    public void showMatchingTasks(List<Task> matchingTasks) {
-        showMessage(formatMatchingTasks(matchingTasks));
+        return formatTasks("Here are the tasks in your list:", tasks.asList());
     }
 
     /**
@@ -129,23 +97,7 @@ public class Ui {
      * @return Formatted matching tasks.
      */
     public String formatMatchingTasks(List<Task> matchingTasks) {
-        StringBuilder response = new StringBuilder("Here are the matching tasks in your list:");
-        for (int index = 0; index < matchingTasks.size(); index++) {
-            response.append(System.lineSeparator())
-                    .append(index + 1)
-                    .append('.')
-                    .append(matchingTasks.get(index));
-        }
-        return response.toString();
-    }
-
-    /**
-     * Displays confirmation that a task was marked as completed.
-     *
-     * @param task Updated task.
-     */
-    public void showTaskMarked(Task task) {
-        showMessage(formatTaskMarked(task));
+        return formatTasks("Here are the matching tasks in your list:", matchingTasks);
     }
 
     /**
@@ -159,15 +111,6 @@ public class Ui {
     }
 
     /**
-     * Displays confirmation that a task was marked as incomplete.
-     *
-     * @param task Updated task.
-     */
-    public void showTaskUnmarked(Task task) {
-        showMessage(formatTaskUnmarked(task));
-    }
-
-    /**
      * Formats confirmation that a task was marked incomplete.
      *
      * @param task Updated task.
@@ -175,16 +118,6 @@ public class Ui {
      */
     public String formatTaskUnmarked(Task task) {
         return "OK, I've marked this task as not done yet:" + System.lineSeparator() + "  " + task;
-    }
-
-    /**
-     * Displays confirmation that a task was removed.
-     *
-     * @param task Removed task.
-     * @param taskCount Number of remaining tasks.
-     */
-    public void showTaskDeleted(Task task, int taskCount) {
-        showMessage(formatTaskDeleted(task, taskCount));
     }
 
     /**
@@ -198,16 +131,6 @@ public class Ui {
         return "Noted. I've removed this task:" + System.lineSeparator()
                 + "  " + task + System.lineSeparator()
                 + formatTaskCount(taskCount);
-    }
-
-    /**
-     * Displays confirmation that a task was added.
-     *
-     * @param task Added task.
-     * @param taskCount Number of stored tasks.
-     */
-    public void showTaskAdded(Task task, int taskCount) {
-        showMessage(formatTaskAdded(task, taskCount));
     }
 
     /**
@@ -261,5 +184,16 @@ public class Ui {
     private String formatTaskCount(int taskCount) {
         String taskWord = taskCount == 1 ? "task" : "tasks";
         return "Now you have " + taskCount + " " + taskWord + " in the list.";
+    }
+
+    private String formatTasks(String heading, List<Task> tasks) {
+        StringBuilder response = new StringBuilder(heading);
+        for (int index = 0; index < tasks.size(); index++) {
+            response.append(System.lineSeparator())
+                    .append(index + 1)
+                    .append('.')
+                    .append(tasks.get(index));
+        }
+        return response.toString();
     }
 }
