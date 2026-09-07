@@ -3,6 +3,7 @@ package chris.task;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Stores tasks and provides operations for managing them.
@@ -95,13 +96,9 @@ public class TaskList {
      * @return Matching tasks in their original order.
      */
     public List<Task> find(String keyword) {
-        ArrayList<Task> matchingTasks = new ArrayList<>();
-        for (Task task : this.tasks) {
-            if (task.containsKeyword(keyword)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return this.tasks.stream()
+                .filter(task -> task.containsKeyword(keyword))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
