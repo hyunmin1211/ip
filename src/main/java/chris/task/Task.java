@@ -54,6 +54,21 @@ public abstract class Task {
     }
 
     /**
+     * Returns whether another task has the same type and description.
+     *
+     * <p>Task descriptions are compared without considering letter case so that
+     * minor capitalization differences do not create duplicate tasks.
+     *
+     * @param otherTask Task to compare with this task.
+     * @return {@code true} if both tasks have the same basic details.
+     */
+    boolean hasSameDetails(Task otherTask) {
+        return otherTask != null
+                && this.getClass() == otherTask.getClass()
+                && this.description.equalsIgnoreCase(otherTask.description);
+    }
+
+    /**
      * Returns the numeric completion status used in the data file.
      *
      * @return {@code 1} if completed, or {@code 0} otherwise.
