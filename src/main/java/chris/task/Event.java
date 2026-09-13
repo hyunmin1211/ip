@@ -24,6 +24,22 @@ public class Event extends Task {
     }
 
     /**
+     * Returns whether another event has the same description, start, and end details.
+     *
+     * @param otherTask Task to compare with this event.
+     * @return {@code true} if both events have matching details.
+     */
+    @Override
+    boolean hasSameDetails(Task otherTask) {
+        if (!super.hasSameDetails(otherTask)) {
+            return false;
+        }
+        Event otherEvent = (Event) otherTask;
+        return this.from.equalsIgnoreCase(otherEvent.from)
+                && this.to.equalsIgnoreCase(otherEvent.to);
+    }
+
+    /**
      * Returns this event task in the format used for persistent storage.
      *
      * @return Serialized event task.

@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import chris.exception.ChrisException;
+
 /**
  * Stores tasks and provides operations for managing them.
  */
@@ -31,8 +33,14 @@ public class TaskList {
      * Adds a task to the list.
      *
      * @param task Task to add.
+     * @throws ChrisException If a task with the same details already exists.
      */
-    public void add(Task task) {
+    public void add(Task task) throws ChrisException {
+        boolean isDuplicate = this.tasks.stream()
+                .anyMatch(existingTask -> existingTask.hasSameDetails(task));
+        if (isDuplicate) {
+            throw new ChrisException("That task is already in your list.");
+        }
         this.tasks.add(task);
     }
 
