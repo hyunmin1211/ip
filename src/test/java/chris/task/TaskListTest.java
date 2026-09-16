@@ -16,6 +16,21 @@ import chris.exception.ChrisException;
  */
 public class TaskListTest {
     /**
+     * Verifies that a unique task is added successfully.
+     *
+     * @throws ChrisException If the unique task is unexpectedly rejected.
+     */
+    @Test
+    public void add_uniqueTask_addsTask() throws ChrisException {
+        TaskList tasks = new TaskList();
+
+        tasks.add(new Todo("read book"));
+
+        assertEquals(1, tasks.size());
+        assertEquals("[T][ ] read book", tasks.get(0).toString());
+    }
+
+    /**
      * Verifies that find returns matching tasks in their original order.
      */
     @Test
@@ -132,6 +147,46 @@ public class TaskListTest {
         tasks.add(new Deadline("submit report", LocalDate.of(2026, 9, 20)));
 
         assertEquals(2, tasks.size());
+    }
+
+    /**
+     * Verifies that marking and unmarking update the selected task.
+     */
+    @Test
+    public void markAndUnmark_validIndex_updatesCompletionStatus() {
+        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+
+        Task markedTask = tasks.mark(0);
+        assertEquals("[T][X] read book", markedTask.toString());
+
+        Task unmarkedTask = tasks.unmark(0);
+        assertEquals("[T][ ] read book", unmarkedTask.toString());
+    }
+
+    /**
+     * Verifies that deleting a task returns it and closes the list gap.
+     */
+    @Test
+    public void delete_validIndex_removesAndReturnsTask() {
+        TaskList tasks = new TaskList(List.of(new Todo("first"), new Todo("second")));
+
+        Task deletedTask = tasks.delete(0);
+
+        assertEquals("[T][ ] first", deletedTask.toString());
+        assertEquals(1, tasks.size());
+        assertEquals("[T][ ] second", tasks.get(0).toString());
+    }
+
+    /**
+     * Verifies that callers cannot modify the task list through its public view.
+     */
+    @Test
+    public void asList_returnedView_cannotBeModified() {
+        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+
+        assertThrows(UnsupportedOperationException.class, () ->
+                tasks.asList().add(new Todo("write notes")));
+        assertEquals(1, tasks.size());
     }
 
     /**
