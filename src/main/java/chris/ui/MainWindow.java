@@ -47,16 +47,24 @@ public class MainWindow extends AnchorPane {
      */
     public void setChris(Chris chris) {
         this.chris = chris;
-        dialogContainer.getChildren().add(DialogBox.getChrisWelcomeDialog(chris.getWelcomeMessage(), chrisImage));
+        dialogContainer.getChildren().add(
+                DialogBox.getChrisWelcomeDialog(chris.getWelcomeMessage(), chrisImage));
     }
 
     @FXML
     private void handleUserInput() {
-        String input = userInput.getText();
+        String input = userInput.getText().trim();
+        if (input.isEmpty()) {
+            return;
+        }
+
         String response = chris.getResponse(input);
+        DialogBox responseDialog = isErrorResponse(response)
+                ? DialogBox.getChrisErrorDialog(response, chrisImage)
+                : DialogBox.getChrisDialog(response, chrisImage);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input),
-                DialogBox.getChrisDialog(response, chrisImage));
+                responseDialog);
         userInput.clear();
 
         if (chris.isExitRequested()) {
@@ -64,5 +72,9 @@ public class MainWindow extends AnchorPane {
             exitDelay.setOnFinished(event -> Platform.exit());
             exitDelay.play();
         }
+    }
+
+    private boolean isErrorResponse(String response) {
+        return response.startsWith("OOPS!!!");
     }
 }
