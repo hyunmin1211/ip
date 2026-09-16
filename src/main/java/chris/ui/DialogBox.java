@@ -49,7 +49,9 @@ public class DialogBox extends HBox {
      * @return User dialog box.
      */
     public static DialogBox getUserDialog(String message) {
-        return new DialogBox(message, null);
+        DialogBox dialogBox = new DialogBox(message, null);
+        dialogBox.getStyleClass().add("user-dialog");
+        return dialogBox;
     }
 
     /**
@@ -62,6 +64,20 @@ public class DialogBox extends HBox {
     public static DialogBox getChrisDialog(String message, Image image) {
         DialogBox dialogBox = new DialogBox(message, image);
         dialogBox.flip();
+        dialogBox.getStyleClass().add("chris-dialog");
+        return dialogBox;
+    }
+
+    /**
+     * Creates a visually highlighted dialog for an error reported by Chris.
+     *
+     * @param message Error explanation.
+     * @param image Chris's display image.
+     * @return Highlighted Chris error dialog box.
+     */
+    public static DialogBox getChrisErrorDialog(String message, Image image) {
+        DialogBox dialogBox = getChrisDialog(message, image);
+        dialogBox.getStyleClass().add("error-dialog");
         return dialogBox;
     }
 
@@ -74,6 +90,7 @@ public class DialogBox extends HBox {
      */
     public static DialogBox getChrisWelcomeDialog(String message, Image image) {
         DialogBox dialogBox = getChrisDialog(message, image);
+        dialogBox.getStyleClass().add("welcome-dialog");
         dialogBox.dialog.setStyle("-fx-font-family: monospace;");
         return dialogBox;
     }
